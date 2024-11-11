@@ -1,6 +1,9 @@
 import 'package:car_order/brand_colors.dart';
+import 'package:car_order/screens/mainpage.dart';
 import 'package:car_order/screens/registrationpage.dart';
 import 'package:car_order/widget/taxi_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,6 +19,23 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = new TextEditingController();
 
   final TextEditingController passwordController = new TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  void login() async {
+    var user = (await _auth.signInWithEmailAndPassword(
+            email: emailController.text, password: passwordController.text))
+        .user;
+
+    if (user != null) {
+      var userRef = FirebaseDatabase.instance.ref().child('users/${user.uid}');
+      userRef.once().then((value) => {
+            if (value != null)
+              {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, MainPage.id, (route) => false)
+              }
+          });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                     color: BrandColors.colorGreen,
                     text: "LOGIN",
                     onPressed: () {
-
-                      
+                      login();
                     },
                   )
                 ],

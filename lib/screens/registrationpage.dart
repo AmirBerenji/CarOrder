@@ -34,7 +34,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 email: emailController.text, password: passwordController.text)
             .catchError((ex) {
       PlatformException eex = ex;
-      print("Amir Insert Error: "+eex.message.toString());
+      print("Amir Insert Error: " + eex.message.toString());
     }))
         .user;
 
