@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:car_order/brand_colors.dart';
+import 'package:car_order/styles/styles.dart';
 import 'package:car_order/widget/brand_devider.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 
@@ -16,7 +18,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  double searchSheetHeight =(Platform.isIOS)? 300 : 275;
+  GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  double searchSheetHeight = (Platform.isIOS) ? 300 : 275;
 
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
@@ -24,6 +27,29 @@ class _MainPageState extends State<MainPage> {
   late GoogleMapController mapController;
 
   double mapBottomPadding = 0;
+
+  var geolocator = GeolocatorPlatform.instance;
+  late Position currentPosition;
+
+  Future<void> setupPositionLocator() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      // Handle the case where the user has denied the permission
+      print("Location permissions are denied");
+      return;
+    }
+
+    var position = await geolocator.getCurrentPosition(
+        locationSettings:
+            LocationSettings(accuracy: LocationAccuracy.bestForNavigation));
+    currentPosition = position;
+
+    LatLng pos = LatLng(position.latitude, position.longitude);
+    CameraPosition cp = CameraPosition(target: pos, zoom: 14);
+    mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
+  }
 
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -39,7 +65,77 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: scaffoldKey,
         backgroundColor: Colors.white,
+        drawer: Container(
+          width: 250,
+          color: Colors.white,
+          child: Drawer(
+            child: ListView(
+              padding: EdgeInsets.all(0),
+              children: [
+                Container(
+                    height: 160,
+                    child: DrawerHeader(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                      ),
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            'images/user_icon.png',
+                            height: 60,
+                            width: 60,
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Amir Berenji',
+                                  style: TextStyle(
+                                      fontSize: 20, fontFamily: 'Brand-Bold')),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                'View Profile',
+                                style: TextStyle(fontSize: 15),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    )),
+                SizedBox(
+                  height: 10,
+                ),
+                ListTile(
+                  leading: Icon(OMIcons.cardGiftcard),
+                  title: Text('Free Rides', style: KDrawerItemStyle),
+                ),
+                ListTile(
+                  leading: Icon(OMIcons.creditCard),
+                  title: Text('Payments', style: KDrawerItemStyle),
+                ),
+                ListTile(
+                  leading: Icon(OMIcons.history),
+                  title: Text('Ride History', style: KDrawerItemStyle),
+                ),
+                ListTile(
+                  leading: Icon(OMIcons.contactSupport),
+                  title: Text('Support', style: KDrawerItemStyle),
+                ),
+                ListTile(
+                  leading: Icon(OMIcons.info),
+                  title: Text('About', style: KDrawerItemStyle),
+                )
+              ],
+            ),
+          ),
+        ),
         body: Stack(
           children: [
             GoogleMap(
@@ -47,6 +143,9 @@ class _MainPageState extends State<MainPage> {
               mapToolbarEnabled: true,
               mapType: MapType.normal,
               myLocationEnabled: true,
+              zoomGesturesEnabled: true,
+              zoomControlsEnabled: true,
+              buildingsEnabled: true,
               initialCameraPosition: _kGooglePlex,
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
@@ -55,8 +154,39 @@ class _MainPageState extends State<MainPage> {
                 setState(() {
                   mapBottomPadding = 310;
                 });
+
+                setupPositionLocator();
               },
             ),
+
+            ///Toggle menu
+            Positioned(
+              top: 50,
+              left: 25,
+              child: GestureDetector(
+                onTap: () {
+                  scaffoldKey.currentState?.openDrawer();
+                },
+                child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: const [
+                          BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 5.0,
+                              spreadRadius: 0.5,
+                              offset: Offset(0.7, 0.7)),
+                        ]),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 20,
+                      child: Icon(Icons.menu),
+                    )),
+              ),
+            ),
+
+            ///Searched Sheet
             Positioned(
               left: 0,
               right: 0,
