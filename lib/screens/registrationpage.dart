@@ -1,6 +1,7 @@
 import 'package:car_order/brand_colors.dart';
 import 'package:car_order/screens/loginpage.dart';
 import 'package:car_order/screens/mainpage.dart';
+import 'package:car_order/widget/progress_dialog.dart';
 import 'package:car_order/widget/taxi_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -29,6 +30,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> registerUser() async {
+
+ showDialog(
+      barrierDismissible: false,
+      context: context, builder: (BuildContext context) => ProgressDialog(status: 'Logging you in'));
+
+
+
     var user = (await _auth
             .createUserWithEmailAndPassword(
                 email: emailController.text, password: passwordController.text)
@@ -48,6 +56,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
       };
 
       newUserRef.set(userMap);
+
+      Navigator.pop(context);
 
       Navigator.pushNamedAndRemoveUntil(context, MainPage.id, (route) => false);
     }

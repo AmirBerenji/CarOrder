@@ -1,6 +1,7 @@
 import 'package:car_order/brand_colors.dart';
 import 'package:car_order/screens/mainpage.dart';
 import 'package:car_order/screens/registrationpage.dart';
+import 'package:car_order/widget/progress_dialog.dart';
 import 'package:car_order/widget/taxi_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -21,6 +22,13 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = new TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   void login() async {
+
+
+    showDialog(
+      barrierDismissible: false,
+      context: context, builder: (BuildContext context) => ProgressDialog(status: 'Logging you in'));
+
+
     var user = (await _auth.signInWithEmailAndPassword(
             email: emailController.text, password: passwordController.text))
         .user;
@@ -28,12 +36,16 @@ class _LoginPageState extends State<LoginPage> {
     if (user != null) {
       var userRef = FirebaseDatabase.instance.ref().child('users/${user.uid}');
       userRef.once().then((value) => {
-            if (value != null)
-              {
+            
+            if(value != null)
+            {
+                  
                 Navigator.pushNamedAndRemoveUntil(
                     context, MainPage.id, (route) => false)
-              }
+            }
+
           });
+          Navigator.pop(context);
     }
   }
 

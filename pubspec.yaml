@@ -38,6 +38,8 @@ dependencies:
   firebase_core:  
   firebase_database:
   firebase_auth: ^4.17.0
+  google_maps_flutter: ^2.9.0
+  outline_material_icons: ^1.0.0
 
 
 
