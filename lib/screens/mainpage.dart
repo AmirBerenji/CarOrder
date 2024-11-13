@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:car_order/brand_colors.dart';
+import 'package:car_order/helper/helpermethods.dart';
 import 'package:car_order/styles/styles.dart';
 import 'package:car_order/widget/brand_devider.dart';
 import 'package:flutter/material.dart';
@@ -49,6 +50,10 @@ class _MainPageState extends State<MainPage> {
     LatLng pos = LatLng(position.latitude, position.longitude);
     CameraPosition cp = CameraPosition(target: pos, zoom: 14);
     mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
+
+    // String address = await HelperMethods.findCordinateAddress(position);
+    // print(address);
+    
   }
 
   static const CameraPosition _kGooglePlex = CameraPosition(
