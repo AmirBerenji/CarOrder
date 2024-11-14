@@ -2,13 +2,16 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:car_order/brand_colors.dart';
+import 'package:car_order/dataprovider/appdata.dart';
 import 'package:car_order/helper/helpermethods.dart';
+import 'package:car_order/screens/searchpage.dart';
 import 'package:car_order/styles/styles.dart';
 import 'package:car_order/widget/brand_devider.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
+import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -51,9 +54,10 @@ class _MainPageState extends State<MainPage> {
     CameraPosition cp = CameraPosition(target: pos, zoom: 14);
     mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
 
-    // String address = await HelperMethods.findCordinateAddress(position);
-    // print(address);
-    
+    String address =
+        await HelperMethods.findCordinateAddress(position, context);
+
+    print(address);
   }
 
   static const CameraPosition _kGooglePlex = CameraPosition(
@@ -231,30 +235,38 @@ class _MainPageState extends State<MainPage> {
                       const SizedBox(
                         height: 5,
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
-                            boxShadow: const [
-                              BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 5,
-                                  spreadRadius: 0.5,
-                                  offset: Offset(0.7, 0.7)),
-                            ]),
-                        child: const Padding(
-                          padding: EdgeInsets.all(12.0),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.search,
-                                color: Colors.blueAccent,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text('Search Destination'),
-                            ],
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SearchPage()));
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                              boxShadow: const [
+                                BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 5,
+                                    spreadRadius: 0.5,
+                                    offset: Offset(0.7, 0.7)),
+                              ]),
+                          child: const Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.search,
+                                  color: Colors.blueAccent,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text('Search Destination'),
+                              ],
+                            ),
                           ),
                         ),
                       ),

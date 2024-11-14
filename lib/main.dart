@@ -1,8 +1,10 @@
+import 'package:car_order/dataprovider/appdata.dart';
 import 'package:car_order/screens/loginpage.dart';
 import 'package:car_order/screens/mainpage.dart';
 import 'package:car_order/screens/registrationpage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,20 +29,25 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Car Order',
-      theme: ThemeData(
-        fontFamily: 'Brand-Regular',
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    
+    return 
+      ChangeNotifierProvider(
+      create: (context) => AppData(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Car Order',
+        theme: ThemeData(
+          fontFamily: 'Brand-Regular',
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        initialRoute: LoginPage.id,
+        routes: {
+          RegistrationPage.id: (context) =>  RegistrationPage(),
+          LoginPage.id: (context) =>  LoginPage(),
+          MainPage.id: (contexxt) => const MainPage()
+        },
       ),
-      initialRoute: MainPage.id,
-      routes: {
-        RegistrationPage.id: (context) =>  RegistrationPage(),
-        LoginPage.id: (context) =>  LoginPage(),
-        MainPage.id: (contexxt) => const MainPage()
-      },
     );
   }
 }
